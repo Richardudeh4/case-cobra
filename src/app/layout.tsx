@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Toaster } from "@/components/ui/toaster";
 import Provider from "@/components/Providers";
+import { ClerkProvider } from "@clerk/nextjs";
 
 const recursive= Recursive({ subsets: ["latin"] });
 
@@ -19,6 +20,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
+  
     <html lang="en">
       <body className={recursive.className}>
         <Navbar/>
@@ -34,5 +36,7 @@ export default function RootLayout({
         <Toaster/>
         </body>
     </html>
+        
+
   );
 }

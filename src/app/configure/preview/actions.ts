@@ -1,5 +1,6 @@
 "use server"
 
+import { stripe } from "@/lib/stripe"
 import { BASE_PRICE, PRODUCTS_PRICES } from "@/src/config/products"
 import { db } from "@/src/db"
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server"
@@ -23,6 +24,7 @@ export const createCheckoutSession = async({
     if(!user){
         throw new Error("you need to be logged in ")
     }
+    console.log(user.id, configuration.id)
     const { finish, material} = configuration
 
     let price = BASE_PRICE
@@ -49,4 +51,26 @@ export const createCheckoutSession = async({
             }
         })
     }
+    const product = await stripe.products.create({
+        name: "Custom Iphone case",
+        images: [configuration.imageUrl],
+        default_price_data: {
+            currency: "USD",
+            unit_amount:  price,
+        },
+    })
+
+    const stripeSession = await stripe.checkout.sessions.create({
+        success_url: `${process.env.NEXT_PUBLIC_SERVER_URL}/thank-you?orderId=${order.id}`,
+       cancel_url: `${process.env.NEXT_PUBLIC_SERVER_URL}/configure/preview?id=${configuration.id}`,
+       payment_method_types: ["card", "paypal"],
+       mode: "payment",
+       shipping_address_collection: {allowed_countries: ["NG", "US","GB", "FR","CD", "CN", "VN", "AG"]},
+       metadata: {
+        userId: user.id,
+        orderId: order.id,
+       },
+       line_items: [{price:  product.default_price as string, quantity: 1 }],
+    })
+    return { url : stripeSession.url}
 }
