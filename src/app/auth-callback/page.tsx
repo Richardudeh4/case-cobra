@@ -1,6 +1,6 @@
 "use client";
 
-import { useQueries, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { getAuthStatus } from "./action";
 import { useRouter } from "next/navigation";
@@ -9,6 +9,8 @@ import { Loader2 } from "lucide-react";
 const Page = () => {
     const [configId, setConfigId] = useState<string | null>(null)
     const router = useRouter();
+
+
     useEffect(() => {
     const configurationId = localStorage.getItem("configurationId")
     if(configurationId) setConfigId(configurationId)
@@ -41,4 +43,4 @@ router.push(`/configure/preview?id=${configId}`)
     )
 }
 
-export default Page();
+export default Page;
